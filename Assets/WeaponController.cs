@@ -80,6 +80,8 @@ public class WeaponController : MonoBehaviour
         {
             Fire(_hitCollider);
             DrawLaser(_hitposition);
+            yield return new WaitForSeconds(0.03f);
+            DrawLaser(_muzzle.position);
             yield return new WaitForSeconds(_fireRate);
         }
     }

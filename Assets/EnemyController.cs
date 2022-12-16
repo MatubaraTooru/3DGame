@@ -6,6 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     [SerializeField] int _hp = 10;
     [SerializeField] GameObject _particle;
+    [SerializeField, Header("Rayのスタートポイント")] Transform[] _rayStartPoints;
     public int _nowHP { get; set; }
     // Start is called before the first frame update
     void Start()
