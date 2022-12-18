@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] int _hp = 10;
     [SerializeField] GameObject _particle;
     [SerializeField, Header("Rayのスタートポイント")] Transform[] _rayStartPoints;
+    [SerializeField] Transform[] _wayPoints;
+    [SerializeField] NavMeshAgent _navMeshAgent;
     public int _nowHP { get; set; }
     // Start is called before the first frame update
     void Start()
