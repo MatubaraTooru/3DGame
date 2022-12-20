@@ -6,14 +6,29 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] float _moveSpeed = 3;
-    Rigidbody _rb = default;
+    [SerializeField] Rigidbody _rb = default;
+    [SerializeField] WeaponController _weaponController;
 
     void Start()
     {
-        _rb = GetComponent<Rigidbody>();
+        
     }
 
     void Update()
+    {
+        Move();
+
+        if (Input.GetMouseButton(0))
+        {
+            _weaponController.Fire();
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            _weaponController.EndFire();
+        }
+    }
+
+    void Move()
     {
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");

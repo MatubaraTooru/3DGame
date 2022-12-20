@@ -470,7 +470,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 8004
+  m_VersionIndex: 8007
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -776,7 +776,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 788
+  m_VersionIndex: 791
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -999,14 +999,14 @@ HingeJoint:
   m_GameObject: {fileID: 8617966722043220438}
   m_ConnectedBody: {fileID: 8617966720813341724}
   m_ConnectedArticulationBody: {fileID: 0}
-  m_Anchor: {x: -0.5, y: 0.5, z: 0}
+  m_Anchor: {x: -0.5, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: 0, z: 0}
+  m_ConnectedAnchor: {x: 0, y: 1.5569992, z: 0}
   m_UseSpring: 1
   m_Spring:
-    spring: 0.5
-    damper: 1
+    spring: 3
+    damper: 5
     targetPosition: 0
   m_UseMotor: 0
   m_Motor:
