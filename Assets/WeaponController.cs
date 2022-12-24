@@ -52,7 +52,7 @@ public class WeaponController : MonoBehaviour
     {
         if (_coroutine == null)
         {
-            _coroutine = StartCoroutine(FireRoutine());
+            _coroutine = StartCoroutine(FireRoutine(hitposition, hitcollider));
             Debug.Log("Start Coroutine");
         }
     }

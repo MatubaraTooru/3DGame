@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 [RequireComponent(typeof(Rigidbody))]
 
 public class PlayerController : MonoBehaviour
@@ -8,6 +10,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _moveSpeed = 3;
     [SerializeField] Rigidbody _rb = default;
     [SerializeField] WeaponController _weaponController;
+    [SerializeField] Image _crosshair;
+    Ray _ray;
 
     void Start()
     {
@@ -17,6 +21,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Move();
+        _ray = Camera.main.ScreenPointToRay(_crosshair.rectTransform.position);
 
         if (Input.GetMouseButton(0))
         {
