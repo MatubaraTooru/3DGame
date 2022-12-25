@@ -8,37 +8,61 @@ public class WeaponController : MonoBehaviour
 {
     [SerializeField, Header("銃口の位置")] Transform _muzzle;
     [SerializeField, Header("射程距離")] float _range;
-    public float Range { get; private set; }
     [SerializeField] LineRenderer _lineRenderer;
     [SerializeField, Header("連射速度")] float _fireRate;
     [SerializeField, Header("一発のダメージ")] float _weaponDamage;
+    [SerializeField, Header("クロスヘアの画像")] Image _crosshair;
     Vector3 _hitposition;
     Collider _hitcollider;
     Coroutine _coroutine = null;
+    Ray _ray;
     void Start()
     {
-        Range = _range;
+        
     }
-
-    public void Fire(Vector3 hitposition, Collider hitcollider)
+    private void Update()
     {
-        if (hitposition == default)
+        _ray = Camera.main.ScreenPointToRay(_crosshair.rectTransform.position);
+
+        RaycastHit hit = default;
+        _hitcollider = null;
+        _hitposition = _muzzle.position + _muzzle.forward * _range;
+
+        if (Physics.Raycast(_ray, out hit, _range))
         {
-            _hitposition = _muzzle.position + _muzzle.forward * _range;
+            _hitposition = hit.point;
+            _hitcollider = hit.collider;
+        }
+
+        if (_hitcollider && _hitcollider.CompareTag("Enemy"))
+        {
+            _crosshair.color = Color.red;
         }
         else
         {
-            _hitposition = hitposition;
+            _crosshair.color = Color.green;
         }
 
+        if (Input.GetMouseButton(0))
+        {
+            Fire();
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            StopFire();
+        }
+    }
+
+    void Fire()
+    {
         if (_coroutine == null)
         {
-            _coroutine = StartCoroutine(FireRoutine(_hitposition, hitcollider));
+            _coroutine = StartCoroutine(FireRoutine());
             Debug.Log("Start Coroutine");
         }
     }
 
-    public void EndFire()
+    void StopFire()
     {
         StopCoroutine(_coroutine);
         _coroutine = null;
@@ -53,15 +77,14 @@ public class WeaponController : MonoBehaviour
         _lineRenderer.SetPositions(positions);
     }
 
-    IEnumerator FireRoutine(Vector3 hitposition, Collider hitcollider)
+    IEnumerator FireRoutine()
     {
         while (true)
         {
-            Debug.Log("Coroutine Active");
-            DrawLaser(hitposition);
-            if (hitcollider.CompareTag("Enemy") || hitcollider.CompareTag("Player"))
+            DrawLaser(_hitposition);
+            if (_hitcollider.CompareTag("Enemy"))
             {
-                hitcollider.GetComponent<HPManager>().NowHP -= _weaponDamage;
+                _hitcollider.GetComponent<HPManager>().NowHP -= _weaponDamage;
             }
             yield return new WaitForSeconds(0.03f);
             DrawLaser(_muzzle.position);
