@@ -12,23 +12,64 @@ public class WeaponController : MonoBehaviour
     [SerializeField, Header("連射速度")] float _fireRate;
     [SerializeField, Header("一発のダメージ")] float _weaponDamage;
     [SerializeField, Header("クロスヘアの画像")] Image _crosshair;
+    [SerializeField, Header("弾倉の大きさ")] int _magsize;
+    [SerializeField] Text _magText;
+    [SerializeField] float _reloadSpeed;
+    float _reloadTimer;
+    int _remainingammo;
     Vector3 _hitposition;
     Collider _hitcollider;
-    Coroutine _coroutine = null;
     Ray _ray;
+    float _rateTimer;
     void Start()
     {
-        
+        _remainingammo = _magsize;
+        _rateTimer = _fireRate;
+        _magText.text = _magsize.ToString();
     }
     private void Update()
     {
+        _rateTimer += Time.deltaTime;
+        _magText.text = $"{_remainingammo} / {_magsize}";
+
+        Sight();
+        if (Input.GetMouseButton(0) && _reloadTimer <= 0)
+        {
+            if (_rateTimer > _fireRate && _remainingammo > 0)
+            {
+                DrawLaser(_hitposition);
+                Attack();
+                _remainingammo--;
+                _rateTimer = 0;
+            }
+            else
+            {
+                DrawLaser(_muzzle.position);
+            }
+        }
+        else
+        {
+            DrawLaser(_muzzle.position);
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Reload();
+            _reloadTimer += Time.deltaTime;
+            if (_reloadTimer > _reloadSpeed)
+            {
+                _reloadTimer = 0;
+            }
+        }
+    }
+    void Sight()
+    {
         _ray = Camera.main.ScreenPointToRay(_crosshair.rectTransform.position);
 
-        RaycastHit hit = default;
         _hitcollider = null;
         _hitposition = _muzzle.position + _muzzle.forward * _range;
 
-        if (Physics.Raycast(_ray, out hit, _range))
+        if (Physics.Raycast(_ray, out RaycastHit hit, _range))
         {
             _hitposition = hit.point;
             _hitcollider = hit.collider;
@@ -42,32 +83,18 @@ public class WeaponController : MonoBehaviour
         {
             _crosshair.color = Color.green;
         }
-
-        if (Input.GetMouseButton(0))
-        {
-            Fire();
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            StopFire();
-        }
     }
 
-    void Fire()
+    void Attack()
     {
-        if (_coroutine == null)
+        if (_hitcollider && _hitcollider.CompareTag("Enemy"))
         {
-            _coroutine = StartCoroutine(FireRoutine());
-            Debug.Log("Start Coroutine");
+            _hitcollider.GetComponent<HPManager>().NowHP -= _weaponDamage;
         }
     }
-
-    void StopFire()
+    void Reload()
     {
-        StopCoroutine(_coroutine);
-        _coroutine = null;
-        DrawLaser(_muzzle.position);
-        Debug.Log("Stop Coroutine");
+        _remainingammo = _magsize;
     }
 
     void DrawLaser(Vector3 destiation)
@@ -75,20 +102,5 @@ public class WeaponController : MonoBehaviour
         Vector3[] positions = { _muzzle.position, destiation };
         _lineRenderer.positionCount = positions.Length;
         _lineRenderer.SetPositions(positions);
-    }
-
-    IEnumerator FireRoutine()
-    {
-        while (true)
-        {
-            DrawLaser(_hitposition);
-            if (_hitcollider.CompareTag("Enemy"))
-            {
-                _hitcollider.GetComponent<HPManager>().NowHP -= _weaponDamage;
-            }
-            yield return new WaitForSeconds(0.03f);
-            DrawLaser(_muzzle.position);
-            yield return new WaitForSeconds(_fireRate);
-        }
     }
 }

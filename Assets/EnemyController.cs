@@ -6,42 +6,55 @@ using UnityEngine.AI;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] GameObject _particle;
-    [SerializeField, Header("Rayのスタートポイント")] Transform[] _rayStartPoints;
+    [SerializeField, Header("Rayのスタートポイント")] Transform _rayStartPoint;
     [SerializeField] float _maxDistance;
     [SerializeField] Transform[] _wayPoints;
     [SerializeField] NavMeshAgent _navMeshAgent;
     [SerializeField] HPManager _hpManager;
+    [SerializeField] Animator _animator;
     int _currentWaypointIndex;
-    float _saveSpeed;
+    bool _detected;
     // Start is called before the first frame update
     void Start()
     {
         _navMeshAgent.SetDestination(_wayPoints[0].position);
-        _saveSpeed = _navMeshAgent.speed;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if (_hpManager.NowHP < 0)
+        if (_hpManager.NowHP <= 0)
         {
-            Death();
+            Destroy(gameObject);
         }
-        sighting(false);
+        Detect();
     }
-    void sighting(bool b)
+    void Detect()
     {
-        if (b)
+        Ray ray = new Ray(_rayStartPoint.position, transform.forward);
+        Debug.DrawRay(_rayStartPoint.position, transform.forward, Color.red);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, _maxDistance))
         {
-            Transform playerpos = GameObject.FindGameObjectWithTag("Player").transform;
-            transform.forward = playerpos.position - this.transform.position;
-            _navMeshAgent.speed = 0;
+            if (hit.collider.CompareTag("Player"))
+            {
+                _detected = true;
+            }
+            else
+            {
+                _detected = false;
+            }
+        }
+
+        if (_detected)
+        {
+            _navMeshAgent.isStopped = true;
+
         }
         else
         {
-            _navMeshAgent.speed = _saveSpeed;
-            if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
+            _navMeshAgent.isStopped = false;
+            if (_navMeshAgent.remainingDistance < _navMeshAgent.stoppingDistance)
             {
                 _currentWaypointIndex = (_currentWaypointIndex + 1) % _wayPoints.Length;
                 _navMeshAgent.SetDestination(_wayPoints[_currentWaypointIndex].position);
@@ -49,9 +62,9 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    void Death()
+    private void OnDestroy()
     {
-        Instantiate(_particle, transform.position, Quaternion.identity);
-        Destroy(gameObject);
+        GameObject particle = Instantiate(_particle, transform.position, Quaternion.identity);
+        Destroy(particle, 1f);
     }
 }

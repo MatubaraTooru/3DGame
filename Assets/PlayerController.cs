@@ -8,24 +8,33 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] float _moveSpeed = 3;
-    [SerializeField] Rigidbody _rb = default;
+    [SerializeField] Rigidbody _rb;
+    [SerializeField] Slider _hpSlider;
+    [SerializeField] HPManager _hpManager;
+    float _h;
+    float _v;
 
     void Start()
     {
-        
+        Cursor.visible = false;
+        _hpSlider.maxValue = _hpManager.NowHP;
     }
 
     void Update()
+    {
+        _h = Input.GetAxisRaw("Horizontal");
+        _v = Input.GetAxisRaw("Vertical");
+
+        _hpSlider.value = _hpManager.NowHP;
+    }
+    private void FixedUpdate()
     {
         Move();
     }
 
     void Move()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-
-        Vector3 dir = Vector3.forward * v + Vector3.right * h;
+        Vector3 dir = Vector3.forward * _v + Vector3.right * _h;
         dir = Camera.main.transform.TransformDirection(dir);
         dir.y = 0;
         if (dir != Vector3.zero) this.transform.forward = dir;
